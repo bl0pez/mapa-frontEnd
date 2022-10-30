@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./src/imagenweb.png" width="100%" alt="Nest Logo" />
+<img src="./src/imagenweb.png" width="100%" alt="imagen proyecto" />
 </div>
 
 ## Ejecutar en desarrollo
