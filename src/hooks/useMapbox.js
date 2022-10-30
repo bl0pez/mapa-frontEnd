@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import mapboxgl from 'mapbox-gl';
+import { v4 } from 'uuid';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJ5YW5sb3BlenMiLCJhIjoiY2w5dWwzdTVoMjJlYzN2b3VjOHg4NWo3bCJ9.6TYm_jtPU7qLWwRpifQWbQ';
 
@@ -10,10 +11,26 @@ export const useMapbox = (puntoInicial) => {
     const setRef = useCallback((node) => {
         mapRef.current = node;
     });
+
+    // Referencia a los marcadores
+    const marcadores = useRef({});
     
-    
+    // Mapa y coords
     const mapa = useRef();
     const [coords, setCoords] = useState(puntoInicial);
+
+    // Funcion para agregar marcadores
+    const agregarMarcador = useCallback((ev) => {
+        const { lng, lat } = ev.lngLat || ev;
+        const marker = new mapboxgl.Marker();
+        marker.id = v4();
+        marker
+        .setLngLat([lng, lat])
+        .addTo(mapa.current)
+        .setDraggable(true);
+
+        marcadores.current[marker.id] = marker;
+    }, []);
 
     useEffect(() => {
         const map = new mapboxgl.Map({
@@ -42,11 +59,19 @@ export const useMapbox = (puntoInicial) => {
       //Hacemos un return para que cuando se desmonte el componente se desactive el listener
       // return map?.off('move');
 
-    }, [])
+    }, []);
+
+    //agregar marcadores al mapa
+    useEffect(() => {
+        mapa.current?.on('click', agregarMarcador);
+
+    }, [agregarMarcador]);
     
 
     return {
         coords,
+        agregarMarcador,
+        marcadores,
         setRef,
     }
 
